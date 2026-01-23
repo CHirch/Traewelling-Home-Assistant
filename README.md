@@ -93,3 +93,31 @@ This card shows current data on dashboard if user is checked-in as defined by th
     - condition: state
         entity: binary_sensor.trawelling_check_in_aktiv
         state: "on"
+
+# Check-in reminder
+
+This automation reminds the user to check in if connecting to public transport wifi.
+
+        alias: Träwelling check-in reminder
+        description: ""
+        triggers:
+        - trigger: template
+            value_template: >-
+            {{ states('sensor.jelly_star_wi_fi_connection') in ['nordbahn-WiFi',
+            'WIFI@DB', 'Mobyklick', 'Regio-S-Bahn WLAN', 'WLAN@start', 'WIFIonICE',
+            'metronom free WLAN', 'LieblingsWlan@erixxSH', 'UESTRA_free_WIFI'] }}
+            for:
+            hours: 0
+            minutes: 1
+            seconds: 0
+        conditions:
+        - condition: state
+            entity_id: binary_sensor.trawelling_check_in_aktiv
+            state:
+            - "off"
+        actions:
+        - action: telegram_bot.send_message
+            metadata: {}
+            data:
+            message: Bitte in Träwelling einchecken!
+        mode: single
